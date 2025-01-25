@@ -6,11 +6,17 @@ const http = require('http');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Usar puerto dinámico en Render
 
+// Configuración de CORS
+const corsOptions = {
+    origin: ['https://gps-frontend-liqg.onrender.com'], // Agrega el dominio de tu frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Servir archivos estáticos desde "public"
 
@@ -28,9 +34,9 @@ const server = http.createServer(app);
 const io = new Server(server, {
     path: '/socket.io',
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+        origin: 'https://gps-frontend-liqg.onrender.com', // Permitir dominio del frontend
+        methods: ["GET", "POST"],
+    },
 });
 
 // Clave secreta para JWT
