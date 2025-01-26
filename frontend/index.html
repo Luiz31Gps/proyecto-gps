@@ -12,121 +12,128 @@
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilo básico para el mapa */
+        /* General */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        nav a:hover {
+            background-color: #555;
+        }
+
+        nav a.active {
+            background-color: #007bff;
+        }
+
+        #content > div {
+            display: none;
+        }
+
+        #content > div.active {
+            display: block;
+        }
+
         #map {
             height: 500px;
             width: 100%;
-            margin-top: 20px;
-            display: none; /* Ocultar mapa inicialmente */
         }
 
-        /* Contenedor de notificaciones */
         .notification {
             padding: 10px;
-            margin: 10px 0;
+            margin: 10px;
             border: 1px solid transparent;
             border-radius: 4px;
         }
 
-        .notification.info {
-            color: #31708f;
-            background-color: #d9edf7;
-            border-color: #bce8f1;
-        }
-
         .notification.success {
-            color: #3c763d;
             background-color: #dff0d8;
             border-color: #d6e9c6;
+            color: #3c763d;
         }
 
         .notification.error {
-            color: #a94442;
             background-color: #f2dede;
             border-color: #ebccd1;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            float: right;
+            color: #a94442;
         }
     </style>
 </head>
 <body>
     <h1>Monitoreo de Vehículos</h1>
+    <nav>
+        <a href="#" class="tab-link active" data-tab="map-tab">Mapa</a>
+        <a href="#" class="tab-link" data-tab="units-tab">Unidades</a>
+        <a href="#" class="tab-link" data-tab="add-unit-tab">Agregar Unidad</a>
+    </nav>
+
+    <!-- Contenido dinámico -->
+    <div id="content">
+        <!-- Mapa -->
+        <div id="map-tab" class="active">
+            <h2>Mapa Interactivo</h2>
+            <div id="map"></div>
+        </div>
+
+        <!-- Unidades -->
+        <div id="units-tab">
+            <h2>Unidades</h2>
+            <div id="vehicle-list-container">
+                <ul id="vehicle-list"></ul>
+            </div>
+        </div>
+
+        <!-- Agregar Unidad -->
+        <div id="add-unit-tab">
+            <h2>Agregar Nuevo Vehículo</h2>
+            <form id="vehicle-form">
+                <label for="vehicle-name">Nombre del Vehículo:</label>
+                <input type="text" id="vehicle-name" required>
+                <label for="latitude">Latitud:</label>
+                <input type="number" id="latitude" step="any" required>
+                <label for="longitude">Longitud:</label>
+                <input type="number" id="longitude" step="any" required>
+                <button type="submit">Agregar Vehículo</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Contenedor de notificaciones -->
     <div id="notifications-container"></div>
 
-    <!-- Formulario de autenticación -->
-    <div id="auth-container">
-        <h2>Autenticación</h2>
-        <form id="register-form">
-            <h3>Registro</h3>
-            <label for="register-username">Usuario:</label>
-            <input type="text" id="register-username" required>
-            <label for="register-password">Contraseña:</label>
-            <input type="password" id="register-password" required>
-            <button type="submit">Registrarse</button>
-        </form>
-        <form id="login-form">
-            <h3>Inicio de Sesión</h3>
-            <label for="login-username">Usuario:</label>
-            <input type="text" id="login-username" required>
-            <label for="login-password">Contraseña:</label>
-            <input type="password" id="login-password" required>
-            <button type="submit">Iniciar Sesión</button>
-        </form>
-    </div>
-
-    <!-- Formulario para agregar vehículos -->
-    <div id="form-container" style="display: none;">
-        <h2>Agregar Nuevo Vehículo</h2>
-        <form id="vehicle-form">
-            <label for="vehicle-name">Nombre del Vehículo:</label>
-            <input type="text" id="vehicle-name" required>
-            <label for="latitude">Latitud:</label>
-            <input type="number" id="latitude" step="any" required>
-            <label for="longitude">Longitud:</label>
-            <input type="number" id="longitude" step="any" required>
-            <button type="submit">Agregar Vehículo</button>
-        </form>
-        <button id="use-location">Usar mi Ubicación</button>
-    </div>
-
-    <!-- Formulario para definir un área geográfica -->
-    <div id="geo-alert-container" style="display: none;">
-        <h2>Definir Área Geográfica</h2>
-        <form id="geo-alert-form">
-            <label for="geo-center">Centro del Área (Latitud, Longitud):</label>
-            <input type="text" id="geo-center" placeholder="Ejemplo: 19.432608, -99.133209" required>
-            <label for="geo-radius">Radio del Área (metros):</label>
-            <input type="number" id="geo-radius" step="any" required>
-            <button type="submit">Definir Área</button>
-        </form>
-    </div>
-
-    <!-- Mapa interactivo -->
-    <div id="map"></div>
-
-    <!-- Panel de estadísticas -->
-    <div id="stats-container" style="display: none;">
-        <h2>Estadísticas en Tiempo Real</h2>
-        <p>Total de Vehículos: <span id="total-vehicles">0</span></p>
-        <p>Vehículos Dentro del Área: <span id="inside-area">0</span></p>
-        <p>Vehículos Fuera del Área: <span id="outside-area">0</span></p>
-    </div>
-
-    <!-- Lista de vehículos activos -->
-    <div id="vehicle-list-container" style="display: none;">
-        <h2>Vehículos Activos</h2>
-        <ul id="vehicle-list"></ul>
-    </div>
-
     <!-- Script principal -->
+    <script>
+        // Manejo de pestañas
+        document.querySelectorAll('.tab-link').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
+                document.querySelectorAll('#content > div').forEach(content => content.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById(e.target.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
